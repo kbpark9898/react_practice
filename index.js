@@ -9,6 +9,6 @@ mongoose.connect("mongodb://kbpark9898:park0130@boiler-plate-shard-00-00.m8yyl.m
     useNewUrlParser : "true", useUnifiedTopology:"true", useCreateIndex:"true", useFindAndModify:"false"
 }).then(() => console.log("cunnect success"))
   .catch(err => console.log(err))
-app.get('/', (req, res) => res.send('Hello World!'))
+app.get('/', (req, res) => res.send('안녕하세요!'))
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
