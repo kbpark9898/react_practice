@@ -16,6 +16,7 @@ app.get('/', (req, res) => res.send('안녕하세요!'))
 app.post('/register', (req, res)=>{
   //회원가입에 필요한 정보를 client 에게서 받아오면 데이터베이스에 넣어준다.
   //7강 8분부터 이어서 시청할것
+  //다시 커밋해도 유저 정보 저장 안되어있나?
 
 })
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
