@@ -31,20 +31,36 @@ const userSchema = mongoose.Schema({
         type: Number
     }
 })
+
 userSchema.pre("save", function(next){
     var usr = this;
-    if(usr.isModified('password')){
+    if(usr.isModified("password")){
         bcrypt.genSalt(saltRounds, function(err, salt){
             if(err) return next(err)
             bcrypt.hash(usr.password, salt, function(err, hash){
                 if(err) return next(err)
-                usr.password = hash
-                next()
+                usr.password = hash;
+                next();
             })
         })
+    }else{
+        next();
     }
-
 })
+// userSchema.method.comparePassword = function(plainPassword, cb){
+//     bcrypt.compare(plainPassword, this.password, function(err, isMatch){
+//         if(err) return cb(err),
+//             cb(null, isMatch)
+
+//     })
+// }
+
+userSchema.method.passwordCompare = function(plainPassword, cb){
+    bcrypt.compare(plainPassword, this.password, function(err, isMatch){
+        if(err) return cb(err);
+        cb(null, isMatch)
+    })
+}
 const User = mongoose.model("User", userSchema)
 
 module.exports={User}
