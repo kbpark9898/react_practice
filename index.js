@@ -1,7 +1,6 @@
 const express = require('express')
 const app = express()
 const port = 5000
-const db_url = "mongodb+srv://kbpark9898:<password>@boiler-plate.m8yyl.mongodb.net/<dbname>?retryWrites=true&w=majority"
 const {User} = require('./models/user')
 const bodyParser = require('body-parser')
 const mongoose = require("mongoose")
