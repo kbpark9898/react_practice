@@ -50,4 +50,5 @@ app.post('/login', (req, res)=>{
     })
   })
 })
+//12강 시청할것!
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
