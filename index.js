@@ -6,8 +6,10 @@ const bodyParser = require('body-parser')
 const mongoose = require("mongoose")
 const key = require('./config/key')
 const user = require('./models/user')
+const cookieParser = require('cookie-parser')
 app.use(bodyParser.urlencoded({extended:'true'}))
 app.use(bodyParser.json())
+app.use(cookieParser())
 mongoose.connect(key.mongoURI, {
     useNewUrlParser : "true", useUnifiedTopology:"true", useCreateIndex:"true", useFindAndModify:"false"
 }).then(() => console.log("cunnect success"))
@@ -22,22 +24,6 @@ app.post('/register', (req, res)=>{
   })
 })
 
-// app.post('/login', (req, res)=>{
-//   User.findOne({email: req.body.email}, (err, userInfo)=>{
-//     if(!userInfo){
-//       return res.json({
-//         loginSucccess:false,
-//         message:"찾고자 하는 계정 정보가 존재하지 않습니다."
-//       })
-//     }
-//     userInfo.comparePassword(req.body.password, (err, isMatch)=>{
-//       if(!isMatch){
-//         return res.json({loginSucccess:false, message:"비밀번호가 맞지 않습니다. 다시 시도해주세요."})
-//       }
-//     })
-//   })
-// })
-
 app.post('/login', (req, res)=>{
   User.findOne(req.body.email, (err, userinfo)=>{
     if(!userinfo){
@@ -47,8 +33,14 @@ app.post('/login', (req, res)=>{
       if(!isMatch){
         return res.json({loginSuccess:false, message:"비밀번호가 맞지 않습니다."})
       }
+      userinfo.generateToken((err, user)=>{
+        if(err) return res.status(400).send(err)
+        //토큰을 쿠키에 저장하기
+        res.cookie("x.auth", user.token).status(200).json({loginSuccess:true, userid:user._id})
+
+      })
     })
   })
 })
-//12강 시청할것!
+//12강 복습할것!
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
