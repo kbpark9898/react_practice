@@ -7,6 +7,8 @@ const mongoose = require("mongoose")
 const key = require('./config/key')
 const user = require('./models/user')
 const cookieParser = require('cookie-parser')
+const auth = require('./middleware/auth')
+
 app.use(bodyParser.urlencoded({extended:'true'}))
 app.use(bodyParser.json())
 app.use(cookieParser())
@@ -16,7 +18,7 @@ mongoose.connect(key.mongoURI, {
   .catch(err => console.log(err))
 app.get('/', (req, res) => res.send('안녕하세요! 연결되나요?'))
 
-app.post('/register', (req, res)=>{
+app.post('/api/user/register', (req, res)=>{
   const user = new User(req.body)
   user.save((err,userInfo)=>{
     if(err) return res.json({success:false, err})
@@ -24,7 +26,7 @@ app.post('/register', (req, res)=>{
   })
 })
 
-app.post('/login', (req, res)=>{
+app.post('/api/user/login', (req, res)=>{
   User.findOne(req.body.email, (err, userinfo)=>{
     if(!userinfo){
       return res.json({loginSuccess:false, message:"이메일이 존재하지 않습니다."})
@@ -40,6 +42,19 @@ app.post('/login', (req, res)=>{
 
       })
     })
+  })
+})
+
+app.get('/api/user/auth', auth, (req, res)=>{
+  //여기까지 미들웨어를 통과하여 인증되었다면, authentication이 완료되었다는 말
+  res.status(200).json({
+    _id:req.userData._id,
+    isAdmin:req.userData.role === 0 ? false:true,
+    isAuth:true,
+    name: req.userData.name,
+    email: req.userData.email,
+    lastname: req.userData.lastname,
+    role: req.userData.role
   })
 })
 //12강 복습할것!
