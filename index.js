@@ -7,7 +7,7 @@ const mongoose = require("mongoose")
 const key = require('./config/key')
 const user = require('./models/user')
 const cookieParser = require('cookie-parser')
-const auth = require('./middleware/auth')
+const {auth} = require('./middleware/auth')
 
 app.use(bodyParser.urlencoded({extended:'true'}))
 app.use(bodyParser.json())
@@ -27,7 +27,7 @@ app.post('/api/user/register', (req, res)=>{
 })
 
 app.post('/api/user/login', (req, res)=>{
-  User.findOne(req.body.email, (err, userinfo)=>{
+  User.findOne({email:req.body.email}, (err, userinfo)=>{
     if(!userinfo){
       return res.json({loginSuccess:false, message:"이메일이 존재하지 않습니다."})
     }
@@ -38,7 +38,7 @@ app.post('/api/user/login', (req, res)=>{
       userinfo.generateToken((err, user)=>{
         if(err) return res.status(400).send(err)
         //토큰을 쿠키에 저장하기
-        res.cookie("x.auth", user.token).status(200).json({loginSuccess:true, userid:user._id})
+        res.cookie("x_auth", user.token).status(200).json({loginSuccess:true, userid:user._id})
 
       })
     })
@@ -48,13 +48,19 @@ app.post('/api/user/login', (req, res)=>{
 app.get('/api/user/auth', auth, (req, res)=>{
   //여기까지 미들웨어를 통과하여 인증되었다면, authentication이 완료되었다는 말
   res.status(200).json({
-    _id:req.userData._id,
-    isAdmin:req.userData.role === 0 ? false:true,
+    _id:req.user._id,
+    isAdmin:req.user.role === 0 ? false:true,
     isAuth:true,
-    name: req.userData.name,
-    email: req.userData.email,
-    lastname: req.userData.lastname,
-    role: req.userData.role
+    name: req.user.name,
+    email: req.user.email,
+    lastname: req.user.lastname,
+    role: req.user.role
+  })
+})
+app.get('/api/user/logout', auth, (req, res)=>{
+  User.findOneAndUpdate({_id:req.user._id}, {token:""}, (err, user)=>{
+    if(err) return res.json({success:false, err})
+    return res.status(200).send({success:true})
   })
 })
 //12강 복습할것!

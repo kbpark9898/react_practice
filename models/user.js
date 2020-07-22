@@ -56,20 +56,33 @@ userSchema.pre("save", function(next){
 //     })
 // }
 
-userSchema.method.passwordCompare = function(plainPassword, cb){
+userSchema.methods.passwordCompare = function(plainPassword, cb){
     bcrypt.compare(plainPassword, this.password, function(err, isMatch){
         if(err) return cb(err);
         cb(null, isMatch)
     })
 }
-userSchema.method.generateToken =function(cb){
+userSchema.methods.generateToken =function(cb){
     //jsonwebtoken을 이용해서 토큰 생성
     var user = this;
-    var token = jwt.sign(user._id, 'secretToken')
+    var token = jwt.sign(user._id.toHexString(), 'secretToken')
     user.token = token
     user.save(function(err, user){
         if(err) return cb(err)
         cb(null, user)
+    })
+}
+userSchema.statics.findbyToken = function(token, cb){
+    var user = this;
+    // 토큰을 decode 한다.
+    jwt.verify(token, 'secretToken', function(err, decoded){
+        //user id를 이용해서 유저를 찾은 다음에 토큰을 가져오고
+        //가져온 토큰과 클라이언트에 저장된 토큰을 비교한다.
+        user.findOne({"_id":decoded, "token":token}, (err, userData)=>{
+            if(err) return cb(err)
+            cb(null, userData)
+        })
+
     })
 }
 const User = mongoose.model("User", userSchema)
