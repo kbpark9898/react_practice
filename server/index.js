@@ -17,7 +17,7 @@ mongoose.connect(key.mongoURI, {
 }).then(() => console.log("cunnect success"))
   .catch(err => console.log(err))
 app.get('/', (req, res) => res.send('안녕하세요! 연결되나요?'))
-
+app.get('/api/hello',(req, res)=>res.send("안녕하세요~"))
 app.post('/api/user/register', (req, res)=>{
   const user = new User(req.body)
   user.save((err,userInfo)=>{
