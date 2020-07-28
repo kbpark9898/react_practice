@@ -1,11 +1,11 @@
 const express = require('express')
 const app = express()
 const port = 5000
-const {User} = require('./models/user')
+const {User} = require('../models/user')
 const bodyParser = require('body-parser')
 const mongoose = require("mongoose")
 const key = require('./config/key')
-const user = require('./models/user')
+const user = require('../models/user')
 const cookieParser = require('cookie-parser')
 const {auth} = require('./middleware/auth')
 
